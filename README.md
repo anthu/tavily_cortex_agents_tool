@@ -9,13 +9,13 @@ The Tavily Web Search custom tool allows Snowflake Intelligence agents to perfor
 ## Features
 
 - Real-time web search using Tavily's advanced search API
+- SECRETS clause integration for secure API key mapping
 - Native Python secret access using `_snowflake` module for optimal security
 - Configurable result limits to optimize performance
 - Domain filtering (include/exclude specific domains)
 - Response size optimization to comply with Snowflake Intelligence 16KB limit
 - Error handling and structured response formatting
 - Compatible with Snowflake Intelligence custom tool requirements
-- SECRETS clause integration for secure API key mapping
 
 ## Prerequisites
 
@@ -28,12 +28,17 @@ The Tavily Web Search custom tool allows Snowflake Intelligence agents to perfor
 
 ### Step 1: Copy Setup Script to Workspaces in Snowflake
 
+1. Download or copy the contents of [`setup.sql`](setup.sql)
+2. Open Snowsight and navigate to **Worksheets**
+3. Create a new worksheet and paste the entire setup script
+4. Proceed to Step 2 to review and modify the variables before execution
+
 ### Step 2: Review Script Variables
-Review and update the following variables at the top of setup_instructions.sql:
-- **TAVILY_API_KEY**: Your Tavily API key from [tavily.com](https://tavily.com). Replace the placeholder value with your actual API key.
-- **SNOWFLAKE_INTELLIGENCE_ROLE**: The role that will have access to the custom tool. Default is 'PUBLIC', but you should change this to the specific role used by your Snowflake Intelligence agents.
-- **TARGET_DATABASE**: The database where the procedure will be created. Default is 'SNOWFLAKE_INTELLIGENCE'.
-- **TARGET_SCHEMA**: The schema within the database where the procedure will be created. Default is 'TOOLS'.
+Review and update the following variables at the top of setup.sql:
+- `TAVILY_API_KEY`: Your Tavily API key from [tavily.com](https://tavily.com). Replace the placeholder value with your actual API key.
+- `SNOWFLAKE_INTELLIGENCE_ROLE`: The role that will have access to the custom tool. Default is `'PUBLIC'`, but you should change this to the specific role used by your Snowflake Intelligence agents.
+- `TARGET_DATABASE`: The database where the procedure will be created. Default is `'SNOWFLAKE_INTELLIGENCE'`.
+- `TARGET_SCHEMA`: The schema within the database where the procedure will be created. Default is `'TOOLS'`.
 
 
 ### Step 3: Add to Snowflake Intelligence Agent

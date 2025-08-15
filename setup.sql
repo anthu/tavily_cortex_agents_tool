@@ -2,7 +2,7 @@
 -- Execute these commands in your Snowflake environment
 
 -- Adapt you role to Snowflake Intelligence Users inf needed
-SET TAVILY_API_KEY = '<tavily API key>';
+SET TAVILY_API_KEY = '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';
 SET SNOWFLAKE_INTELLIGENCE_ROLE = 'PUBLIC';
 SET TARGET_DATABASE = 'SNOWFLAKE_INTELLIGENCE';
 SET TARGET_SCHEMA = 'TOOLS';
@@ -28,7 +28,7 @@ SECRET_STRING = $TAVILY_API_KEY
 COMMENT = 'API key for Tavily web search service';
 
 -- Grant access to the secret to roles that will use the procedure
-GRANT USAGE ON SECRET TAVILY_API_KEY TO ROLE IDENTIFIER($SNOWFLAKE_INTELLIGENCE_ROLE);
+GRANT READ ON SECRET TAVILY_API_KEY TO ROLE IDENTIFIER($SNOWFLAKE_INTELLIGENCE_ROLE);
 
 -- Alternative: If you need to update an existing secret
 -- ALTER SECRET TAVILY_API_KEY SET SECRET_STRING = 'your_new_tavily_api_key_here';
@@ -52,8 +52,29 @@ CREATE OR REPLACE EXTERNAL ACCESS INTEGRATION TAVILY_ACCESS_INTEGRATION
 -- Grant usage on the integration
 GRANT USAGE ON INTEGRATION TAVILY_ACCESS_INTEGRATION TO ROLE IDENTIFIER($SNOWFLAKE_INTELLIGENCE_ROLE);
 
--- 6. Create the stored procedure
+-- 6. Create the stored procedure (copy from tavily_web_search_procedure.sql)
 -- Note: The procedure includes a SECRETS clause that maps 'tavily_cred' to TAVILY_API_KEY
+
+-- Grant usage on the specific procedure
+GRANT USAGE ON PROCEDURE SNOWFLAKE_INTELLIGENCE.TOOLS.TAVILY_WEB_SEARCH(STRING, NUMBER, STRING, STRING) TO ROLE PUBLIC;
+
+-- Grant read access to the secret (if not already granted in step 3)
+GRANT READ ON SECRET TAVILY_API_KEY TO ROLE IDENTIFIER($SNOWFLAKE_INTELLIGENCE_ROLE);
+
+-- 8. Test the procedure
+CALL SNOWFLAKE_INTELLIGENCE.TOOLS.TAVILY_WEB_SEARCH('Latest Snowflake Feature Releases', 5, '', '')
+->> 
+WITH rs AS (
+    SELECT parse_json(TAVILY_WEB_SEARCH) AS $1
+)
+SELECT
+    rs.j:"query"::string AS query,
+    r.value:"title"::string AS title,
+    r.value:"url"::string AS url,
+    r.value:"content"::string AS content,
+    r.value:"score"::float AS score
+FROM rs, LATERAL FLATTEN(input => rs.j:"results") r;
+
 CREATE OR REPLACE PROCEDURE TAVILY_WEB_SEARCH(
     SEARCH_QUERY STRING,
     MAX_RESULTS NUMBER DEFAULT 5,
@@ -69,14 +90,14 @@ PACKAGES = ('snowflake-snowpark-python','tavily-python')
 EXTERNAL_ACCESS_INTEGRATIONS = (TAVILY_ACCESS_INTEGRATION)
 SECRETS = ('tavily_cred' = TAVILY_API_KEY)
 HANDLER = 'perform_web_search'
-COMMENT = 'Advanced web search function for real-time information retrieval. Performs intelligent web searches using the Tavily API to find current, relevant information from across the internet. Ideal for answering questions that require up-to-date information, fact-checking, research, and gathering current data not available in training datasets. Returns structured JSON results with titles, URLs, content snippets, and relevance scores. Automatically filters and optimizes results for AI consumption while respecting domain preferences and size constraints.'
+COMMENT = 'TAVILY_WEB_SEARCH: Advanced web search function for real-time information retrieval. Performs intelligent web searches using the Tavily API to find current, relevant information from across the internet. Ideal for answering questions that require up-to-date information, fact-checking, research, and gathering current data not available in training datasets. Returns structured JSON results with titles, URLs, content snippets, and relevance scores. Automatically filters and optimizes results for AI consumption while respecting domain preferences and size constraints.'
 AS
 $$
 import json
 from tavily import TavilyClient
 import _snowflake
 
-def perform_web_search(search_query, max_results=5, search_depth='basic', include_domains='', exclude_domains=''):
+def perform_web_search(search_query, max_results=5, include_domains='', search_depth='basic', exclude_domains=''):
     """
     Performs web search using Tavily Client and returns formatted results.
     
@@ -172,21 +193,3 @@ def perform_web_search(search_query, max_results=5, search_depth='basic', includ
         }
         return json.dumps(error_response)
 $$;
-
--- Grant usage on the specific procedure
-GRANT USAGE ON PROCEDURE SNOWFLAKE_INTELLIGENCE.TOOLS.TAVILY_WEB_SEARCH(STRING, NUMBER, STRING, STRING, STRING) TO ROLE IDENTIFIER($SNOWFLAKE_INTELLIGENCE_ROLE);
-
--- 8. Test the procedure
-USE ROLE IDENTIFIER($SNOWFLAKE_INTELLIGENCE_ROLE);
-CALL SNOWFLAKE_INTELLIGENCE.TOOLS.TAVILY_WEB_SEARCH('Latest Snowflake Feature Releases', 5, 'basic', '', '')
-->> 
-WITH rs AS (
-    SELECT parse_json($1) AS J FROM $1
-)
-SELECT
-    rs.j:"query"::string AS query,
-    r.value:"title"::string AS title,
-    r.value:"url"::string AS url,
-    r.value:"content"::string AS content,
-    r.value:"score"::float AS score
-FROM rs, LATERAL FLATTEN(input => rs.j:"results") r;
