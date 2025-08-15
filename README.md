@@ -86,7 +86,7 @@ that describes the information you need. Examples: "latest Tesla stock price",
 Best practices: Use specific keywords, include relevant context, avoid overly broad terms.
 ```
 
-3. **MAX_RESULTS (NUMBER, OPTIONAL, DEFAULT: 5):**
+3. **MAX_RESULTS (NUMBER, REQUIRED):**
 ```
 Maximum number of search results to return (1-10). Fewer results = faster response and
 lower token usage. More results = broader information coverage. Recommended: 3-5 for 
@@ -94,7 +94,7 @@ focused queries, 5-10 for comprehensive research. The function automatically lim
 prevent oversized responses that exceed Snowflake's return size limits.
 ```
 
-4. **SEARCH_DEPTH (STRING, OPTIONAL, DEFAULT: 'basic'):**
+4. **SEARCH_DEPTH (STRING, REQUIRED):**
 ```
 Controls the depth and comprehensiveness of the search. Options are 'basic' and 'advanced'.
 'basic' provides faster searches suitable for quick information retrieval, while 'advanced'
@@ -102,19 +102,19 @@ performs more thorough searches better suited for comprehensive research. Advanc
 may take longer but provide more detailed and extensive results.
 ```
 
-5. **INCLUDE_DOMAINS (STRING, OPTIONAL, DEFAULT: ''):**
+5. **INCLUDE_DOMAINS (STRING, REQUIRED):**
 ```
 Comma-separated list of specific domains to search within. Use when you want results
 only from trusted or specific sources. Examples: "reuters.com,bbc.com" for news,
 "github.com,stackoverflow.com" for technical content, "sec.gov,investor.gov" for 
-financial data. Leave empty for general web search across all domains.
+financial data. Set to empty String ('') for general web search across all domains.
 ```
 
-6. **EXCLUDE_DOMAINS (STRING, OPTIONAL, DEFAULT: ''):**
+6. **EXCLUDE_DOMAINS (STRING, REQUIRED):**
 ```
 Comma-separated list of domains to exclude from search results. Use to filter out
 unreliable sources or irrelevant content types. Examples: "wikipedia.org" to exclude
-Wikipedia, "reddit.com,quora.com" to exclude social platforms. Leave empty to allow
+Wikipedia, "reddit.com,quora.com" to exclude social platforms. Set to empty String ('') to allow
 all domains except those filtered by Tavily's built-in quality controls.
 ```
 
