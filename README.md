@@ -6,23 +6,9 @@ This repository contains a custom tool implementation for Snowflake Intelligence
 
 The Tavily Web Search custom tool allows Snowflake Intelligence agents to perform real-time web searches and incorporate external information into their responses. This extends the agent's knowledge beyond your Snowflake data to include current web information.
 
-## Features
-
-- Real-time web search using Tavily's advanced search API
-- SECRETS clause integration for secure API key mapping
-- Native Python secret access using `_snowflake` module for optimal security
-- Configurable result limits to optimize performance
-- Domain filtering (include/exclude specific domains)
-- Response size optimization to comply with Snowflake Intelligence 16KB limit
-- Error handling and structured response formatting
-- Compatible with Snowflake Intelligence custom tool requirements
-
 ## Prerequisites
 
 1. **Tavily API Key**: Sign up at [Tavily](https://tavily.com) and obtain an API key
-2. **Snowflake Account**: Access to a Snowflake account with privileges to create stored procedures
-3. **Snowflake Intelligence**: Access to Snowflake Intelligence features
-4. **Python Runtime**: Snowflake Python runtime version 3.9 or higher
 
 ## Installation
 
